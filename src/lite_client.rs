@@ -1,5 +1,5 @@
 use std::{
-    fs::File,
+    fs::{File, OpenOptions},
     io::{Read, Write},
     process::{Child, Stdio},
     thread,
@@ -63,8 +63,8 @@ impl LiteClient {
 
     fn log_data(data: &SmartContractData) -> anyhow::Result<()> {
         let json = serde_json::to_string(data)?;
-        let mut file = File::open("./log.txt")?;
-        // TODO: написить запись данных в файл
+        let mut file = OpenOptions::new().append(true).open("./log.txt")?;
+        file.write_all(json.as_bytes())?;
         Ok(())
     }
 
