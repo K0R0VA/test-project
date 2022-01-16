@@ -85,25 +85,3 @@ impl LiteClient {
         Ok(())
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    use std::time::Duration;
-
-    use tokio::time::sleep;
-
-    use super::*;
-    #[tokio::test]
-    async fn can_get_responce() {
-        if let Ok(mut client) = LiteClient::new(SmartContract {
-            address: "".to_string(),
-            id: 0,
-        }) {
-            sleep(Duration::new(5, 0)).await;
-            client.last().unwrap();
-            let _ = client.get_pow_params();
-            loop {}
-        }
-    }
-}
