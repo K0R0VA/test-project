@@ -11,6 +11,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     drop(file);
     smart_contracts
         .into_iter()
-        .try_for_each(|smart_contract| LiteClient::spawn(smart_contract))?;
+        .try_for_each(LiteClient::spawn)?;
     Ok(())
 }

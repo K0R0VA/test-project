@@ -1,5 +1,4 @@
 use std::{
-    fmt::format,
     fs::File,
     io::{Read, Write},
     process::{Child, Stdio},
@@ -52,10 +51,10 @@ impl LiteClient {
     fn set_data(&mut self, new_data: SmartContractData) -> anyhow::Result<()> {
         if let Some(data) = &self.data {
             if data != &new_data {
+                Self::log_data(&new_data)?;
                 self.data = Some(new_data);
             }
         } else {
-            Self::log_data(&new_data)?;
             self.data = Some(new_data);
         }
         Ok(())
