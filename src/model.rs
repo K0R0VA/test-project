@@ -25,6 +25,12 @@ pub struct SmartContractData {
     pub interval: u32,
 }
 
+impl PartialEq for SmartContractData {
+    fn eq(&self, other: &Self) -> bool {
+        self.seed == other.seed
+    }
+}
+
 impl From<String> for SmartContractData {
     fn from(_: String) -> Self {
         Self::default()

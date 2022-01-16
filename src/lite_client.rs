@@ -51,7 +51,7 @@ impl LiteClient {
     }
     pub fn set_data(&mut self, new_data: SmartContractData) -> anyhow::Result<()> {
         if let Some(data) = &self.data {
-            if data.seed != new_data.seed {
+            if data != &new_data {
                 let json = serde_json::to_string(&new_data)?;
                 self.data = Some(new_data);
                 let mut file = File::open("./log.txt")?;
