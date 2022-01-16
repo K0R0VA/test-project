@@ -1,7 +1,7 @@
 use std::{
     fs::{File, OpenOptions},
-    io::{Read, Write},
-    process::{Child, Stdio},
+    io::{BufRead, BufReader, Read, Write},
+    process::{Child, ChildStdin, ChildStdout, Stdio},
     thread,
     time::Duration,
 };
@@ -19,7 +19,7 @@ impl LiteClient {
         let child = std::process::Command::new("./lite-client")
             .current_dir("./assets")
             .stdin(Stdio::piped())
-            // .stdout(Stdio::piped())
+            .stdout(Stdio::piped())
             .spawn()?;
         Ok(Self {
             child,
@@ -34,19 +34,22 @@ impl LiteClient {
         }
         Ok(())
     }
-    fn get_pow_params(&mut self) -> anyhow::Result<String> {
+    fn run_method(&mut self) -> anyhow::Result<()> {
         if let Some(writer) = self.child.stdin.as_mut() {
             let address = &self.smart_contract.address;
             let command = format!("runmethod  {address}  get_pow_params\n");
             writer.write_all(command.as_bytes())?;
             writer.flush()?;
         }
-        if let Some(reader) = self.child.stdout.as_mut() {
-            let mut buffer = String::new();
-            reader.read_to_string(&mut buffer)?;
-            return Ok(buffer);
-        }
-        Ok("".to_string())
+        Ok(())
+    }
+    fn get_pow_params(&mut self) -> anyhow::Result<String> {
+        let stdout = self.child.stdout.as_mut().expect("no stdout");
+        let mut reader = BufReader::new(stdout);
+        let mut buffer = String::new();
+        reader.read_line(&mut buffer)?;
+        println!("{buffer}");
+        Ok(buffer)
     }
     fn set_data(&mut self, new_data: SmartContractData) -> anyhow::Result<()> {
         if let Some(data) = &self.data {
@@ -79,6 +82,11 @@ impl LiteClient {
                     println!("{e}");
                     break;
                 }
+                if let Err(e) = this.run_method() {
+                    println!("{e}");
+                    break;
+                }
+                thread::sleep(Duration::new(1, 0));
                 if let Ok(params) = this.get_pow_params().map(SmartContractData::from) {
                     if let Err(e) = this.set_data(params) {
                         println!("{e}");
