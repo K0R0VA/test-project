@@ -55,6 +55,7 @@ impl LiteClient {
                 self.data = Some(new_data);
             }
         } else {
+            Self::log_data(&new_data)?;
             self.data = Some(new_data);
         }
         Ok(())
