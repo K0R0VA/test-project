@@ -49,20 +49,25 @@ impl LiteClient {
         }
         Ok("".to_string())
     }
-    pub fn set_data(&mut self, new_data: SmartContractData) -> anyhow::Result<()> {
+    fn set_data(&mut self, new_data: SmartContractData) -> anyhow::Result<()> {
         if let Some(data) = &self.data {
             if data != &new_data {
-                let json = serde_json::to_string(&new_data)?;
                 self.data = Some(new_data);
-                let mut file = File::open("./log.txt")?;
-                file.write_all(json.as_bytes())?;
-                drop(file);
             }
         } else {
+            Self::log_data(&new_data)?;
             self.data = Some(new_data);
         }
         Ok(())
     }
+
+    fn log_data(data: &SmartContractData) -> anyhow::Result<()> {
+        let json = serde_json::to_string(data)?;
+        let mut file = File::open("./log.txt")?;
+        // TODO: написить запись данных в файл
+        Ok(())
+    }
+
     pub fn spawn(smart_contract: SmartContract) -> anyhow::Result<()> {
         let this = Self::new(smart_contract)?;
         thread::sleep(Duration::new(1, 0));
@@ -81,7 +86,8 @@ impl LiteClient {
                     }
                 }
             }
-        }).join();
+        })
+        .join();
         Ok(())
     }
 }

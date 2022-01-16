@@ -33,6 +33,7 @@ impl PartialEq for SmartContractData {
 
 impl From<String> for SmartContractData {
     fn from(_: String) -> Self {
+        // TODO: написать имплемнтация парсина строки в данные
         Self::default()
     }
 }
